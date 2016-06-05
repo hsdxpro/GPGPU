@@ -28,7 +28,7 @@ void checkErr(cl_int err, const char * name)
 	}
 }
 
-void ricsi_test0()
+void ricsi_hello()
 {
 	cl_int err;
 

@@ -124,11 +124,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="hello.cl" />
+    <None Include="Ricsi\hello.cl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aron.h" />
-    <ClInclude Include="ricsi.h" />
+    <ClInclude Include="Aron\aron.h" />
+    <ClInclude Include="Ricsi\ricsi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

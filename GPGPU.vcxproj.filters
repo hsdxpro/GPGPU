@@ -9,19 +9,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ricsi.h">
-      <Filter>Ricsi</Filter>
-    </ClInclude>
-    <ClInclude Include="aron.h">
-      <Filter>Aron</Filter>
-    </ClInclude>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="hello.cl">
+    <None Include="Ricsi\hello.cl">
       <Filter>Ricsi</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="Ricsi\ricsi.h">
+      <Filter>Ricsi</Filter>
+    </ClInclude>
+    <ClInclude Include="Aron\aron.h">
+      <Filter>Aron</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 #pragma once
 
-void aron_test0()
+void aron_hello()
 {
 
 }

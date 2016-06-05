@@ -9,11 +9,11 @@ void main()
 	std::map<std::string, std::function<void()>> functionMap;
 	
 	// Add aron programs
-	functionMap["aron_test0"] = aron_test0;
+	functionMap["aron_hello"] = aron_hello;
 	//functionMap["aron_valami"] = aron_valami;
 
 	// Add ricsi programs
-	functionMap["ricsi_test0"] = ricsi_test0;
+	functionMap["ricsi_hello"] = ricsi_hello;
 	//functionMap["ricsi_valami"] = ricsi_valami;
 
 	std::puts("Enter program name to run: ");
