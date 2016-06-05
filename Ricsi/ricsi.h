@@ -3,6 +3,9 @@
 //#define CL_HPP_NO_STD_VECTOR // Use cl::vector instead of STL version
 #define CL_HPP_TARGET_OPENCL_VERSION 200
 
+#include <SDL.h>
+#undef main
+#include <SDL_video.h>
 #include <CL/cl2.hpp>
 #include <utility>
 #include <vector>
@@ -103,7 +106,59 @@ void ricsi_hello()
 	checkErr(err, "ComamndQueue::enqueueReadBuffer()");
 	std::cout << outH;
 
-	// Print result
-	int tmp;
-	std::cin >> tmp;
+	
+	// Init SDL
+	if(SDL_Init(SDL_INIT_VIDEO) != 0)
+	{
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		assert(0);
+	}
+
+	// Create window
+	int resX = 640;
+	int resY = 480;
+	SDL_Init(SDL_INIT_EVERYTHING);
+
+    SDL_Window *MainWindow = SDL_CreateWindow("GPGPU",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        resX, resY,
+        SDL_WINDOW_SHOWN
+        );
+
+    SDL_Renderer *renderer = SDL_CreateRenderer(MainWindow, -1, 0);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    //SDL_RenderClear(renderer);
+
+    SDL_Texture* backbuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, resX, resY);
+
+	while (1) 
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+		{
+			// Initialize texture pixels to a red opaque RGBA value
+			unsigned char* bytes = nullptr;
+			int pitch = 0;
+			SDL_LockTexture(backbuffer, nullptr, reinterpret_cast<void**>(&bytes), &pitch);
+			unsigned char rgba[4] = { 255, 0, 0, 255 };
+			for(int y = 0; y < resY; ++y) {
+			    for (int x = 0; x < resX; ++x) {
+			        memcpy(&bytes[(y * resX + x)*sizeof(rgba)], rgba, sizeof(rgba));
+			    }
+			}
+			SDL_UnlockTexture(backbuffer);
+
+			//SDL_Rect destination = { 0, 0, resX, resY };
+			SDL_RenderCopy(renderer, backbuffer, NULL, NULL);
+			SDL_RenderPresent(renderer);
+		}
+	}
+
+    //Clean up
+    SDL_DestroyTexture(backbuffer);
+    SDL_DestroyWindow(MainWindow);
+    SDL_Quit();
 }

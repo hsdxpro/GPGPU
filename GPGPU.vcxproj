@@ -86,10 +86,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>External Libraries/AMD_APP_SDK/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External Libraries/AMD_APP_SDK/include;F:\GPGPU\GPGPU\External Libraries\SDL_2_0_4\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;External Libraries/SDL_2_0_4/lib/SDL2.lib;External Libraries/SDL_2_0_4/lib/SDL2main.lib;External Libraries/SDL_2_0_4/lib/SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

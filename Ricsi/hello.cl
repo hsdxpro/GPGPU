@@ -1,6 +1,6 @@
-__constant char hw[] = "Hello World\n";
+constant char hw[] = "Hello World\n";
 
-__kernel void hello(__global char * out)
+kernel void hello(global char * out)
 {
 	size_t tid = get_global_id(0);
 	out[tid] = hw[tid];
