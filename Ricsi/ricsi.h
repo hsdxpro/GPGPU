@@ -70,9 +70,13 @@ void ricsi_hello()
 	// Select device
 	cl::Device& selectedDevice = devices[0];
 
+	int resX = 640;
+	int resY = 480;
+	int bytesPerPixel = 3;
+
 	// Allocate memory
-	char * outH = new char[hw.length()+1];
-	cl::Buffer outCL(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, hw.length() + 1, outH, &err);
+	uint8_t* backbuffer = new uint8_t[resX * resY * bytesPerPixel];
+	cl::Buffer outCL(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, (size_t)(resX * resY * bytesPerPixel), backbuffer, &err);
 	checkErr(err, "Buffer::Buffer()");
 
 	//Compile kernel program
@@ -82,7 +86,7 @@ void ricsi_hello()
 	cl::Program::Sources source;
 	source.push_back(prog);
 	cl::Program program(context, source);
-	err = program.build(devices,"");
+	err = program.build(devices,"-x clc++");
 	checkErr(err, "Program::build()");
 
 	// Create kernel
@@ -95,16 +99,15 @@ void ricsi_hello()
 	cl::CommandQueue queue(context, selectedDevice, 0, &err);
 	checkErr(err, "CommandQueue::CommandQueue()");
 	cl::Event event;
-	err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(hw.length() + 1), cl::NDRange(1, 1), NULL,&event);
+	err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(resX, resY), cl::NDRange(1, 1), NULL, &event);
 	checkErr(err, "ComamndQueue::enqueueNDRangeKernel()");
 
 	// Wait kernel
 	event.wait();
 
 	// Read back result from GPU memory to CPU
-	err = queue.enqueueReadBuffer(outCL, CL_TRUE, 0, hw.length() + 1, outH);
+	err = queue.enqueueReadBuffer(outCL, CL_TRUE, 0, resX * resY * bytesPerPixel, backbuffer);
 	checkErr(err, "ComamndQueue::enqueueReadBuffer()");
-	std::cout << outH;
 
 	
 	// Init SDL
@@ -115,8 +118,6 @@ void ricsi_hello()
 	}
 
 	// Create window
-	int resX = 640;
-	int resY = 480;
 	SDL_Init(SDL_INIT_EVERYTHING);
 
     SDL_Window *MainWindow = SDL_CreateWindow("GPGPU",
@@ -130,35 +131,33 @@ void ricsi_hello()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    //SDL_RenderClear(renderer);
 
-    SDL_Texture* backbuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, resX, resY);
+    SDL_Texture* screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, resX, resY);
 
 	while (1) 
 	{
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
+
+		}
+
+		{
 			// Initialize texture pixels to a red opaque RGBA value
 			unsigned char* bytes = nullptr;
 			int pitch = 0;
-			SDL_LockTexture(backbuffer, nullptr, reinterpret_cast<void**>(&bytes), &pitch);
-			unsigned char rgba[4] = { 255, 0, 0, 255 };
-			for(int y = 0; y < resY; ++y) {
-			    for (int x = 0; x < resX; ++x) {
-			        memcpy(&bytes[(y * resX + x)*sizeof(rgba)], rgba, sizeof(rgba));
-			    }
-			}
-			SDL_UnlockTexture(backbuffer);
+			SDL_LockTexture(screenTexture, nullptr, reinterpret_cast<void**>(&bytes), &pitch);
+			memcpy(bytes, backbuffer, resX * resY * bytesPerPixel);
+			SDL_UnlockTexture(screenTexture);
 
 			//SDL_Rect destination = { 0, 0, resX, resY };
-			SDL_RenderCopy(renderer, backbuffer, NULL, NULL);
+			SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 			SDL_RenderPresent(renderer);
 		}
 	}
 
     //Clean up
-    SDL_DestroyTexture(backbuffer);
+    SDL_DestroyTexture(screenTexture);
     SDL_DestroyWindow(MainWindow);
     SDL_Quit();
 }
