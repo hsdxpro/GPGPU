@@ -89,7 +89,7 @@
       <AdditionalIncludeDirectories>External Libraries/AMD_APP_SDK/include;F:\GPGPU\GPGPU\External Libraries\SDL_2_0_4\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;External Libraries/SDL_2_0_4/lib/SDL2.lib;External Libraries/SDL_2_0_4/lib/SDL2main.lib;External Libraries/SDL_2_0_4/lib/SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;External Libraries/SDL_2_0_4/lib/SDL2.lib;External Libraries/SDL_2_0_4/lib/SDL2main.lib;External Libraries/SDL_2_0_4/lib/SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -122,7 +122,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;External Libraries/SDL_2_0_4/lib/SDL2.lib;External Libraries/SDL_2_0_4/lib/SDL2main.lib;External Libraries/SDL_2_0_4/lib/SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>External Libraries/AMD_APP_SDK/lib/OpenCL.lib;External Libraries/SDL_2_0_4/lib/SDL2.lib;External Libraries/SDL_2_0_4/lib/SDL2main.lib;External Libraries/SDL_2_0_4/lib/SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

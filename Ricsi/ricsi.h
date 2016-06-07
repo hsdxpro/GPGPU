@@ -6,6 +6,7 @@
 #include <SDL.h>
 #undef main
 #include <SDL_video.h>
+#include <SDL_opengl.h>
 #include <CL/cl2.hpp>
 #include <utility>
 #include <vector>
@@ -179,20 +180,60 @@ void ricsi_hello()
 		assert(0);
 	}
 
-	// Create window
-	SDL_Init(SDL_INIT_EVERYTHING);
-
-    SDL_Window* mainWindow = SDL_CreateWindow("GPGPU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, resX, resY, SDL_WINDOW_SHOWN );
-    SDL_Renderer *renderer = SDL_CreateRenderer(mainWindow, -1, 0);
-
-    //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    SDL_Texture* screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, resX, resY);
-
 	cl::CommandQueue queue(context, selectedDevice, 0, &err);
 	checkErr(err, "CommandQueue::CommandQueue()");
 	cl::Event eventt;
 
+
+	//Use OpenGL 3.1 core
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    // Initialize video subsystem
+	SDL_Window* window = NULL;
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        // Display error message
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        return;
+    }
+    else
+    {
+        // Create window
+		window = SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, resX, resY, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+        if( window == NULL )
+        {
+            // Display error message
+            printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+            return;
+        }
+        else
+        {
+            // Create OpenGL context
+			SDL_GLContext  glContext = SDL_GL_CreateContext(window);
+
+            if( glContext == NULL )
+            {
+                // Display error message
+                printf( "OpenGL context could not be created! SDL Error: %s\n", SDL_GetError() );
+                return;
+            }
+            else
+            {
+                // Initialize glew
+                //glewInit();
+            }
+        }
+    }
+
+	glEnable(GL_TEXTURE_2D);
+	GLuint gen;
+	glGenTextures( 1, &gen);
+	glBindTexture(GL_TEXTURE_2D, gen);
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	
 	while (1) 
 	{
 		// Start measure
@@ -221,26 +262,44 @@ void ricsi_hello()
 		
 		// TODO VERY SLOW
 		// Initialize texture pixels to a red opaque RGBA value
-		unsigned char* bytes = nullptr;
-		int pitch = 0;
-		SDL_LockTexture(screenTexture, nullptr, reinterpret_cast<void**>(&bytes), &pitch);
-		memcpy(bytes, backbuffer, resX * resY * bytesPerPixel);
-		SDL_UnlockTexture(screenTexture);
+		//unsigned char* bytes = nullptr;
+		//int pitch = 0;
+		//SDL_LockTexture(screenTexture, nullptr, reinterpret_cast<void**>(&bytes), &pitch);
+		//memcpy(bytes, backbuffer, resX * resY * bytesPerPixel);
+		//SDL_UnlockTexture(screenTexture);
+		//
+		////SDL_Rect destination = { 0, 0, resX, resY };
+		//SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
+		//SDL_RenderPresent(renderer);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, resX, resY, 0, GL_RGB, GL_UNSIGNED_BYTE, backbuffer);
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,1);
+		glVertex3f(-1,-1,-1);
+		glTexCoord2f(0,0);
+		glVertex3f(-1,1,-1);
+		glTexCoord2f(1,0);
+		glVertex3f(1,1,-1);
+		glTexCoord2f(1,1);
+		glVertex3f(1,-1,-1);
+		glEnd();
+		//glLoadIdentity();
 		
-		//SDL_Rect destination = { 0, 0, resX, resY };
-		SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
-		SDL_RenderPresent(renderer);
+
+		// Update window with OpenGL rendering
+		SDL_GL_SwapWindow(window);
 
 		// End measure
 		high_resolution_clock::time_point t2 = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>( t2 - t1 ).count();
 
 		std::string str = std::to_string(duration / 1000.0);
-		SDL_SetWindowTitle(mainWindow, str.c_str());
+		SDL_SetWindowTitle(window, str.c_str());
 	}
 
     //Clean up
-    SDL_DestroyTexture(screenTexture);
-    SDL_DestroyWindow(mainWindow);
+   // SDL_DestroyTexture(screenTexture);
+    SDL_DestroyWindow(window);
     SDL_Quit();
 }
