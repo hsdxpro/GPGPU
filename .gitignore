@@ -13,3 +13,5 @@
 *.ilk
 *.tlog
 *.exe
+*.ipdb
+*.iobj
